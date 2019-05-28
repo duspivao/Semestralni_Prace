@@ -1,8 +1,7 @@
 import itk
 import os
-import datetime
 
-label = 'PATIENT_DICOM '
+label = 'PATIENT_DICOM'
 
 InputImageType  = itk.Image.SS2
 
@@ -14,8 +13,8 @@ TransformType = itk.TranslationTransform[itk.D, 2]
 fixedImageReader = itk.ImageFileReader[FixedImageType].New()
 movingImageReader = itk.ImageFileReader[MovingImageType].New()
 
-fixedImageReader.SetFileName('C:/ZCU/3Dircadb1/3Dircadb1.1/'+label+'/image_13')
-movingImageReader.SetFileName('C:/ZCU/3Dircadb1/3Dircadb1.3/'+label+'/image_38')
+fixedImageReader.SetFileName('C:/Users/duso/OneDrive - AIMTEC a. s/Documents/ZDO/SEM/3Dircadb1.1/'+label+'/image_13')
+movingImageReader.SetFileName('C:/Users/duso/OneDrive - AIMTEC a. s/Documents/ZDO/SEM/3Dircadb1.3/'+label+'/image_38')
 
 fixedImageReader.Update()
 movingImageReader.Update()
@@ -24,10 +23,13 @@ fixedImage = fixedImageReader.GetOutput()
 movingImage = movingImageReader.GetOutput()
 
 registration = itk.ImageRegistrationMethod[fixedImage, movingImage].New()
-imageMetric = itk.MeanSquaresImageToImageMetric[FixedImageType, MovingImageType].New()
+imageMetric = itk.MattesMutualInformationImageToImageMetric[FixedImageType, MovingImageType].New()
 transform = TransformType.New()
 optimizer = itk.RegularStepGradientDescentOptimizer.New()
 interpolator = itk.LinearInterpolateImageFunction[FixedImageType, itk.D].New()
+
+imageMetric.SetNumberOfHistogramBins( 20 )
+imageMetric.SetNumberOfSpatialSamples( 10000 )
 
 registration.SetOptimizer(    optimizer    )
 registration.SetTransform(    transform    )
@@ -86,9 +88,7 @@ outputCast.SetInput(resampler.GetOutput())
 writer = itk.ImageFileWriter[OutPutImageType].New()
 
 
-newpath = 'C:/ZCU/Results/'
-st = datetime.datetime.now().strftime("%d_%m_%y_%H%M")
-newpath = newpath+st
+newpath = 'C:/Users/duso/OneDrive - AIMTEC a. s/Documents/ZDO/SEM/02'
 if not os.path.exists(newpath):
     os.makedirs(newpath)
 
@@ -114,14 +114,4 @@ writer.SetFileName( newpath+'/moving.png' )
 writer.SetInput( filter.GetOutput() )
 writer.Update()
 
-f = open(newpath+"/params.txt","w+")
-f.write("Used methode: TranslationTransform\n")
-f.write("Used metrics: MeanSquaresImageToImageMetric\n")
-f.write("Used optimizer: RegularStepGradientDescentOptimizer\n")
-f.write("Used interpolator: LinearInterpolateImageFunction\n")
-f.write("===========================================================================\n")
-f.write("Final Registration Parameters \n")
-f.write("Translation X =  %f" % (finalParameters.GetElement(0),))
-f.write("\nTranslation Y =  %f" % (finalParameters.GetElement(1),))
-f.write('\n=========END=========\n')
-f.close()
+print('===END===')
