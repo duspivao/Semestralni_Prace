@@ -2,7 +2,7 @@ import itk
 import os
 import datetime
 
-label = 'PATIENT_DICOM'
+label = 'PATIENT_DICOM '
 
 InputImageType  = itk.Image.SS2
 
