@@ -6,6 +6,41 @@ import datetime
 import SimpleITK as sitk
 import traceback
 
+# Dictionaries of implemented methods, metrics etc
+methods = {
+    1: 'Mutual Information',
+    2: 'B-Spline',
+    3: 'DemonsFilter',
+    4: 'FastSymmetricForcesDemonsRegistrationFilter',
+    5: 'DisplacementFieldTransform',
+    6: '---',
+    0: 'ALL'
+}
+metrics = {
+    1: 'MeanSquares',
+    # 2: 'Demons',
+    # 3: 'Correlation',
+    # 4: 'ANTSNeighborhoodCorrelation',
+    # 5: 'JointHistogramMutualInformation',
+    6: 'MattesMutualInformation',
+    0: 'ALL'
+}
+optimizers = {
+    1: 'Exhaustive',
+    2: 'Powell',
+    3: 'Gradient Descent',
+    4: 'Gradient Descent Line Search',
+    5: 'Regular Step Gradient Descent',
+    6: 'L-BFGS-B (Limited memory)',
+    0: 'ALL'
+}
+initialTransform = {
+    1: ''
+}
+global numberOfBins
+global outTx
+
+
 # Output direction in project folder
 script_dir = os.path.dirname(__file__) #<-- absolute dir the script is in
 rel_path = "Results/"
@@ -71,28 +106,12 @@ def inputFolder(movFix):
 
 
 def inputMethods():
-    methods = {
-        1 : 'Mutual Information',
-        2 : 'B-Spline',
-        3 : 'DemonsFilter',
-        4 : 'FastSymmetricForcesDemonsRegistrationFilter',
-        5 : 'DisplacementFieldTransform',
-        6 : '---',
-        0 : 'ALL'
-    }
 
     while True:
         print("Choose registrion method:")
 
         for key in methods.keys():
             print("[" + str(key) + "] - " + methods.get(key))
-        # print("[1] - Mutual Information")
-        # print("[2] - B-Spline")
-        # print("[3] - DemonsFilter")
-        # print("[4] - FastSymmetricForcesDemonsRegistrationFilter")
-        # print("[5] - FastSymmetricForcesDemonsRegistrationFilter")
-        # print("[6] - DisplacementFieldTransform")
-        # print("[0] - ALL with comparation")
 
         try:
             used_method_no = int(input("Enter a number of method:"))
@@ -105,80 +124,180 @@ def inputMethods():
 
 
 def inputMetrics():
-    metrics = {
-        1: 'MeanSquares',
-        2: 'Demons',
-        3: 'Correlation',
-        4: 'ANTSNeighborhoodCorrelation',
-        5: 'JointHistogramMutualInformation',
-        6: 'MattesMutualInformation',
-        0: 'ALL'
-    }
+
 
     while True:
         print("Choose metrics:")
 
         for key in metrics.keys():
             print("[" + str(key) + "] - " + metrics.get(key))
-        # print("[1] - Mutual Information")
-        # print("[2] - B-Spline")
-        # print("[3] - DemonsFilter")
-        # print("[4] - FastSymmetricForcesDemonsRegistrationFilter")
-        # print("[5] - FastSymmetricForcesDemonsRegistrationFilter")
-        # print("[6] - DisplacementFieldTransform")
-        # print("[0] - ALL with comparation")
-
         try:
-            used_method_no = int(input("Enter a number of metric:"))
+            used_metric_no = int(input("Enter a number of metric:"))
         except ValueError:
             print("Write number of metric!")
 
         else:
-            print ('Metric - ' + metrics.get(used_method_no))
-            return (used_method_no)
+            if used_metric_no == 0:
+                optimizers.pop(0)
+            print ('Metric - ' + metrics.get(used_metric_no))
+            return (used_metric_no)
 
 def inputOptimizer():
-    optimizer = {
-        1: 'Exhaustive',
-        2: 'Powell',
-        3: 'Gradient Descent',
-        4: 'Gradient Descent Line Search',
-        5: 'Regular Step Gradient Descent',
-        6: 'L-BFGS-B (Limited memory)',
-        0: 'ALL'
-    }
+
 
     while True:
         print("Choose metrics:")
 
-        for key in optimizer.keys():
-            print("[" + str(key) + "] - " + optimizer.get(key))
-        # print("[1] - Mutual Information")
-        # print("[2] - B-Spline")
-        # print("[3] - DemonsFilter")
-        # print("[4] - FastSymmetricForcesDemonsRegistrationFilter")
-        # print("[5] - FastSymmetricForcesDemonsRegistrationFilter")
-        # print("[6] - DisplacementFieldTransform")
-        # print("[0] - ALL with comparation")
+        for key in optimizers.keys():
+            print("[" + str(key) + "] - " + optimizers.get(key))
 
         try:
-            used_method_no = int(input("Enter a number of metric:"))
+            used_optimizer_no = int(input("Enter a number of metric:"))
         except ValueError:
             print("Write number of metric!")
 
         else:
-            print ('Metric - ' + optimizer.get(used_method_no))
-            return (used_method_no)
+            print ('Metric - ' + optimizers.get(used_optimizer_no))
+            return (used_optimizer_no)
+
+
+def setMetrictsBaseOnMetricNo(metricNo, reg):
+    if metricNo == 1:
+        reg.SetMetricAsMeanSquares()
+        return 0
+    elif metricNo == 6:
+        global numberOfBins
+        numberOfBins = 10
+        reg.SetMetricAsMattesMutualInformation(numberOfBins)
+        return 0
+    return -1
+
+def setOptimizerBaseOnMetricNo(optNo, reg):
+    if optNo == 5:
+        reg.SetOptimizerAsRegularStepGradientDescent(learningRate = 1.0,
+                                                     minStep = 0.001,
+                                                     numberOfIterations = 100,
+                                                     relaxationFactor = 0.5,
+                                                     gradientMagnitudeTolerance = 1e-4,
+                                                     maximumStepSizeInPhysicalUnits = 0.0 )
+        return 0
+    return -1
+
+
+
+def observerMI(method) :
+    print("{0:3}: Value of metric{1:10.5f}; Optimizer position \t#: ".format(method.GetOptimizerIteration(),
+                                           method.GetMetricValue(),
+                                           method.GetOptimizerPosition()))
 
 print("====Image registrion tool for DICOM files====")
 # inputs
-fixed = inputFolder('fixed')
-moving = inputFolder('moving')
+fixImg = inputFolder('fixed')
+movImg = inputFolder('moving')
 methodNo = inputMethods()
 metricNo = inputMetrics()
-optimizer = inputOptimizer()
+optimizerNo = inputOptimizer()
 
 
+txDct = dict()
+if methodNo == 1 or methodNo == 0:
+    global numberOfBins
+    numberOfBins = 10
+    samplingPercentage = 0.20
+
+    if metricNo == 0:
+        metrics.pop(0)
+        for k in metrics.keys():
+            metricName = str(metrics.get(k))
+            optimizersName = str(optimizers.get(optimizerNo))
+
+            mutualInformation = sitk.ImageRegistrationMethod()
+            setMetrictsBaseOnMetricNo(k, mutualInformation)
+            # mutualInformation.SetMetricAsMattesMutualInformation(numberOfBins)
+
+            mutualInformation.SetMetricSamplingPercentage(samplingPercentage)
+            mutualInformation.SetMetricSamplingStrategy(mutualInformation.RANDOM)
+            # mutualInformation.SetOptimizerAsRegularStepGradientDescent(1.0, .001, 200)
+            setOptimizerBaseOnMetricNo(optimizerNo, mutualInformation)
+
+            mutualInformation.SetInitialTransform(sitk.TranslationTransform(fixImg.GetDimension()))
+            mutualInformation.SetInterpolator(sitk.sitkLinear)
+
+            mutualInformation.AddCommand(sitk.sitkIterationEvent, lambda: observerMI(mutualInformation))
+
+
+            global outTx
+            outTx = mutualInformation.Execute(fixImg, movImg)
+            sitk.WriteTransform(outTx, outputDirPath + '/MutualInformation'+'_'+ metricName +'_'+ optimizersName+'.tfm')
+            txDct['MI' + metricName] = outTx
+
+    elif optimizerNo == 0:
+        optimizers.pop(0)
+        for k in optimizers.keys():
+            metricName = str(metrics.get(metricNo))
+            optimizersName = str(optimizers.get(k))
+
+            mutualInformation = sitk.ImageRegistrationMethod()
+            setMetrictsBaseOnMetricNo(k, mutualInformation)
+            # mutualInformation.SetMetricAsMattesMutualInformation(numberOfBins)
+
+            mutualInformation.SetMetricSamplingPercentage(samplingPercentage)
+            mutualInformation.SetMetricSamplingStrategy(mutualInformation.RANDOM)
+            # mutualInformation.SetOptimizerAsRegularStepGradientDescent(1.0, .001, 200)
+            setOptimizerBaseOnMetricNo(optimizerNo, mutualInformation)
+
+            mutualInformation.SetInitialTransform(sitk.TranslationTransform(fixImg.GetDimension()))
+            mutualInformation.SetInterpolator(sitk.sitkLinear)
+
+            mutualInformation.AddCommand(sitk.sitkIterationEvent, lambda: observerMI(mutualInformation))
+
+            global outTx
+            outTx = mutualInformation.Execute(fixImg, movImg)
+            sitk.WriteTransform(outTx, outputDirPath + '/MutualInformation'+'_'+ metricName +'_'+ optimizersName+'.tfm')
+            txDct['MI' + metricName] = outTx
+    else:
+
+        mutualInformation = sitk.ImageRegistrationMethod()
+
+        setMetrictsBaseOnMetricNo(metricNo, mutualInformation)
+        # mutualInformation.SetMetricAsMattesMutualInformation(numberOfBins)
+
+        mutualInformation.SetMetricSamplingPercentage(samplingPercentage)
+        mutualInformation.SetMetricSamplingStrategy(mutualInformation.RANDOM)
+        # mutualInformation.SetOptimizerAsRegularStepGradientDescent(1.0, .001, 200)
+        setOptimizerBaseOnMetricNo(optimizerNo,mutualInformation)
+
+        mutualInformation.SetInitialTransform(sitk.TranslationTransform(fixImg.GetDimension()))
+        mutualInformation.SetInterpolator(sitk.sitkLinear)
+
+        mutualInformation.AddCommand(sitk.sitkIterationEvent, lambda: observerMI(mutualInformation))
+
+        global outTx
+        outTx = mutualInformation.Execute(fixImg, movImg)
+        sitk.WriteTransform(outTx, outputDirPath + '/MutualInformation' + '.tfm')
+
+
+
+resampler = sitk.ResampleImageFilter()
+resampler.SetReferenceImage(fixImg);
+resampler.SetInterpolator(sitk.sitkLinear)
+resampler.SetDefaultPixelValue(100)
+resampler.SetTransform(outTx)
+
+out = resampler.Execute(movImg)
+simg1 = sitk.Cast(sitk.RescaleIntensity(fixImg), sitk.sitkUInt8)
+simg2 = sitk.Cast(sitk.RescaleIntensity(out), sitk.sitkUInt8)
+cimg = sitk.Compose(simg1, simg2, simg1 // 2. + simg2 // 2.)
+sitk.Show(cimg, "RESULT")
+
+outFileName = 'DIC_RESULT.nrrd'
+writer = itk.ImageFileWriter[ itk.Image[itk.ctype('signed short'), 3]].New()
+writer.SetFileName(outputDirPath + '/' + outFileName)
+writer.UseCompressionOn()
+writer.SetInput(cimg)
+
+print('Writing: ' + outputDirPath + '/' + outFileName)
+writer.Update()
 
 
 print('====END====')
