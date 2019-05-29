@@ -18,20 +18,20 @@ methods = {
 }
 metrics = {
     1: 'MeanSquares',
-    # 2: 'Demons',
-    # 3: 'Correlation',
+    2: 'Demons',
+    3: 'Correlation',
     # 4: 'ANTSNeighborhoodCorrelation',
     # 5: 'JointHistogramMutualInformation',
     6: 'MattesMutualInformation',
     0: 'ALL'
 }
 optimizers = {
-    1: 'Exhaustive',
+    # 1: 'Exhaustive',
     2: 'Powell',
-    3: 'Gradient Descent',
-    4: 'Gradient Descent Line Search',
+    # 3: 'Gradient Descent',
+    # 4: 'Gradient Descent Line Search',
     5: 'Regular Step Gradient Descent',
-    6: 'L-BFGS-B (Limited memory)',
+    # 6: 'L-BFGS-B (Limited memory)',
     0: 'ALL'
 }
 initialTransform = {
@@ -137,8 +137,7 @@ def inputMetrics():
             print("Write number of metric!")
 
         else:
-            if used_metric_no == 0:
-                optimizers.pop(0)
+
             print ('Metric - ' + metrics.get(used_metric_no))
             return (used_metric_no)
 
@@ -157,7 +156,7 @@ def inputOptimizer():
             print("Write number of metric!")
 
         else:
-            print ('Metric - ' + optimizers.get(used_optimizer_no))
+            print ('Optimiyer - ' + optimizers.get(used_optimizer_no))
             return (used_optimizer_no)
 
 
@@ -165,6 +164,10 @@ def setMetrictsBaseOnMetricNo(metricNo, reg):
     if metricNo == 1:
         reg.SetMetricAsMeanSquares()
         return 0
+    elif metricNo == 2:
+        reg.SetMetricAsDemons(intensityDifferenceThreshold=10)
+    elif metricNo == 3:
+        reg.SetMetricAsCorrelation()
     elif metricNo == 6:
         global numberOfBins
         numberOfBins = 10
@@ -173,10 +176,16 @@ def setMetrictsBaseOnMetricNo(metricNo, reg):
     return -1
 
 def setOptimizerBaseOnMetricNo(optNo, reg):
-    if optNo == 5:
+    if optNo == 3:
+        reg.SetOptimizerAsPowell(numberOfIterations = 10,
+                                 maximumLineIterations = 1,
+                                 stepLength = 1,
+                                 stepTolerance = 1e-6,
+                                 valueTolerance = 1e-6 )
+    elif optNo == 5:
         reg.SetOptimizerAsRegularStepGradientDescent(learningRate = 1.0,
                                                      minStep = 0.001,
-                                                     numberOfIterations = 100,
+                                                     numberOfIterations = 10,
                                                      relaxationFactor = 0.5,
                                                      gradientMagnitudeTolerance = 1e-4,
                                                      maximumStepSizeInPhysicalUnits = 0.0 )
@@ -186,9 +195,12 @@ def setOptimizerBaseOnMetricNo(optNo, reg):
 
 
 def observerMI(method) :
-    print("{0:3}: Value of metric{1:10.5f}; Optimizer position \t#: ".format(method.GetOptimizerIteration(),
-                                           method.GetMetricValue(),
-                                           method.GetOptimizerPosition()))
+    # print("{0:3}: Value of metric{1:10.5f}; Optimizer position \t#: ".format(method.GetOptimizerIteration(),
+    #                                        method.GetMetricValue(),
+    #                                        method.GetOptimizerPosition()))
+    print("{0:3}: Value of metric{1:10.5f};".format(method.GetOptimizerIteration(),
+                                           method.GetMetricValue()))
+
 
 print("====Image registrion tool for DICOM files====")
 # inputs
@@ -205,14 +217,43 @@ if methodNo == 1 or methodNo == 0:
     numberOfBins = 10
     samplingPercentage = 0.20
 
-    if metricNo == 0:
+    if metricNo == 0 and optimizerNo == 0:
+        metrics.pop(0)
+        optimizers.pop(0)
+        for k in metrics.keys():
+            for k2 in optimizers.keys():
+                metricName = str(metrics.get(k))
+                optimizersName = str(optimizers.get(k2))
+
+                mutualInformation = sitk.ImageRegistrationMethod()
+                setMetrictsBaseOnMetricNo(k, mutualInformation)
+                # mutualInformation.SetMetricAsMattesMutualInformation(numberOfBins)
+
+                mutualInformation.SetMetricSamplingPercentage(samplingPercentage)
+                mutualInformation.SetMetricSamplingStrategy(mutualInformation.RANDOM)
+                # mutualInformation.SetOptimizerAsRegularStepGradientDescent(1.0, .001, 200)
+                setOptimizerBaseOnMetricNo(k2, mutualInformation)
+
+                mutualInformation.SetInitialTransform(sitk.TranslationTransform(fixImg.GetDimension()))
+                mutualInformation.SetInterpolator(sitk.sitkLinear)
+
+                mutualInformation.AddCommand(sitk.sitkIterationEvent, lambda: observerMI(mutualInformation))
+
+                global outTx
+                outTx = mutualInformation.Execute(fixImg, movImg)
+                sitk.WriteTransform(outTx,
+                                    outputDirPath + '/MutualInformation' + '_' + metricName + '_' + optimizersName + '.tfm')
+                txDct['MI' + metricName] = outTx
+
+
+    elif metricNo == 0:
         metrics.pop(0)
         for k in metrics.keys():
             metricName = str(metrics.get(k))
             optimizersName = str(optimizers.get(optimizerNo))
 
             mutualInformation = sitk.ImageRegistrationMethod()
-            setMetrictsBaseOnMetricNo(k, mutualInformation)
+            setMetrictsBaseOnMetricNo(metricNo, mutualInformation)
             # mutualInformation.SetMetricAsMattesMutualInformation(numberOfBins)
 
             mutualInformation.SetMetricSamplingPercentage(samplingPercentage)
@@ -244,7 +285,7 @@ if methodNo == 1 or methodNo == 0:
             mutualInformation.SetMetricSamplingPercentage(samplingPercentage)
             mutualInformation.SetMetricSamplingStrategy(mutualInformation.RANDOM)
             # mutualInformation.SetOptimizerAsRegularStepGradientDescent(1.0, .001, 200)
-            setOptimizerBaseOnMetricNo(optimizerNo, mutualInformation)
+            setOptimizerBaseOnMetricNo(k, mutualInformation)
 
             mutualInformation.SetInitialTransform(sitk.TranslationTransform(fixImg.GetDimension()))
             mutualInformation.SetInterpolator(sitk.sitkLinear)
