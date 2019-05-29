@@ -4,7 +4,7 @@ Semestrální práce na téma registrace obrazových dat CT snmků pomocí nátr
 
 ## SPC_Registration
 
-Python skript, který sdružuje jednotlivé metody. Je možné po jeho spuštění definovat jaká bude použita metoda a metrika. Další možností je spuštění postupně všech implementovaných metod při zvolení jedné metriky. Tato varianta pak uloží výsledky porovnání jednotlivých metod
+Python skript, který sdružuje jednotlivé metody. Je možné po jeho spuštění definovat jaká bude použita metoda a metrika. Další možností je spuštění postupně všech implementovaných metod při zvolení jedné metriky. Tato varianta pak uloží výsledky porovnání jednotlivých metod společně s porovnáním času jaký bežely jednotlivé metody.
 ```
 Give examples
 ```
