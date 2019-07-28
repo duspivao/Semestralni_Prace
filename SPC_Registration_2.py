@@ -7,7 +7,8 @@ import SimpleITK as sitk
 """
 This program is for compare method of registration of 3D medical DICOM series.
 For same metrics is compute for severel methods, so you can compare result of this 
-in result CSV.
+in result CSV. It also compares some data preprocssing like bluering and so on. 
+Final composed result is otherwise made of original DICOMs
 """
 
 
@@ -29,6 +30,7 @@ st = datetime.datetime.now().strftime("%d_%m_%y_%H%M")
 
 # Just for test removed timestamp folders tempora
 # outputDirPath = rel_path+st
+
 outputDirPath = rel_path+'test'
 if not os.path.exists(outputDirPath):
     os.makedirs(outputDirPath)
@@ -36,13 +38,23 @@ abs_file_path = os.path.join(script_dir, outputDirPath+'/')
 
 
 def observer(method) :
-    # print("{0:3}: Value of metric{1:10.5f}; Optimizer position \t#: ".format(method.GetOptimizerIteration(),
-    #                                        method.GetMetricValue(),
-    #                                        method.GetOptimizerPosition()))
+    """
+    Method which is observer to registration it prints iteration number and also metric value of each step
+    :param method:
+    :return: void
+    """
     print("{0:3}: Value of metric{1:10.5f};".format(method.GetOptimizerIteration(),
                                            method.GetMetricValue()))
 
 def writeResult(fixImg,movImg,outTx):
+    """
+    Procedure which saves composed registration image in nrrd format. It also writes every final transformation ito
+    file
+    :param fixImg: Fixed image
+    :param movImg: Moving image
+    :param outTx: Final transformation
+    :return: void
+    """
 
     resampler = sitk.ResampleImageFilter()
     resampler.SetReferenceImage(fixImg);
