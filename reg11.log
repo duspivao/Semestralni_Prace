@@ -1,0 +1,58 @@
+C:\Users\duso\AppData\Local\Continuum\anaconda2\python.exe C:/Users/duso/PycharmProjects/Semestralni_Prace/Registration/Frangis/Reg_Test_11.py
+Gabor filter prepared
+Counting convolutions
+Computing features
+Features prepared
+Clustering
+Clustering K Means
+Clustering DONE
+Time>2773.31500006
+Clustering Gaussian mixtures
+Clustering DONE
+Time>96.6600000858
+Preparing output images
+C:/Users/duso/PycharmProjects/Semestralni_Prace/Registration/Frangis/Reg_Test_11.py:95: RuntimeWarning: divide by zero encountered in double_scalars
+  output2 *= 255.0/output2.max()
+C:/Users/duso/PycharmProjects/Semestralni_Prace/Registration/Frangis/Reg_Test_11.py:95: RuntimeWarning: invalid value encountered in multiply
+  output2 *= 255.0/output2.max()
+3036.36299992
+
+Process finished with exit code 0
+
+
+
+8/2/2019
+C:\Users\duso\AppData\Local\Continuum\anaconda2\python.exe C:/Users/duso/PycharmProjects/Semestralni_Prace/Registration/Frangis/Reg_Test_11.py
+Gabor filter prepared
+Counting convolutions
+Computing features
+Features prepared
+Clustering
+Clustering K Means
+Clustering DONE
+Time>4457.10699987
+Clustering Gaussian mixtures
+Clustering DONE
+Time>12288.2700002
+Preparing output images
+17036.1140001
+
+Process finished with exit code 0
+
+8/2/2019 Small
+C:\Users\duso\AppData\Local\Continuum\anaconda2\python.exe C:/Users/duso/PycharmProjects/Semestralni_Prace/Registration/Frangis/Reg_Test_11.py
+Gabor filter prepared
+Counting convolutions
+Computing features
+Features prepared
+Clustering
+Clustering K Means
+Clustering DONE
+Time>3711.46200013
+Clustering Gaussian mixtures
+Clustering DONE
+Time>3322.53800011
+Preparing output images
+7338.80799985
+
+Process finished with exit code 0
