@@ -62,6 +62,40 @@ def observer(method) :
     print("{0:3}: Value of metric{1:10.5f};".format(method.GetOptimizerIteration(),
                                            method.GetMetricValue()))
 
+
+def mutualInformationRegistrationWithGradientDescentOptimizer(fixImg, movImg, numberOfIterations):
+    start = ti.time()
+
+    # Setting initial transformation
+    initial_transform = sitk.CenteredTransformInitializer(sitk.Cast(fixImg, movImg.GetPixelID()),
+                                                          movImg,
+                                                          sitk.Euler3DTransform(),
+                                                          sitk.CenteredTransformInitializerFilter.GEOMETRY)
+    print initial_transform
+
+    # Setting of mutual informartion method parameters
+    registration_method = sitk.ImageRegistrationMethod()
+    registration_method.SetMetricAsMattesMutualInformation(numberOfHistogramBins=50)
+    registration_method.SetMetricSamplingStrategy(registration_method.RANDOM)
+    registration_method.SetMetricSamplingPercentage(0.01)
+
+    # Interpolator set as linear
+    registration_method.SetInterpolator(sitk.sitkLinear)
+    registration_method.SetOptimizerAsGradientDescent(learningRate=2.0, numberOfIterations=numberOfIterations)
+    registration_method.SetOptimizerScalesFromPhysicalShift()
+    registration_method.SetInitialTransform(initial_transform, inPlace=False)
+
+    final_transform_v1 = registration_method.Execute(sitk.Cast(fixImg, sitk.sitkFloat32),
+                                                     sitk.Cast(movImg, sitk.sitkFloat32))
+
+    print('Optimizer\'s stopping condition, {0}'.format(registration_method.GetOptimizerStopConditionDescription()))
+    print('Final metric value: {0}'.format(registration_method.GetMetricValue()))
+
+    print(final_transform_v1)
+    end = ti.time()
+
+    return final_transform_v1, registration_method.GetMetricValue(), end - start
+
 def writeResult(fixImg,movImg,outTx):
     """
     Procedure which saves composed registration image in nrrd format. It also writes every final transformation ito
@@ -183,21 +217,19 @@ def BSplineMultiScale(fixImg, movImg, numberOfIterations):
     start = ti.time()
 
     transformDomainMeshSize = [2] * fixImg.GetDimension()
-    tx = sitk.BSplineTransformInitializer(movImg,
-                                          transformDomainMeshSize)
-
-    # print("Initial Number of Parameters: {0}".format(tx.GetNumberOfParameters()))
 
     R = sitk.ImageRegistrationMethod()
     R.SetMetricAsCorrelation()
-
-    R.SetOptimizerAsGradientDescentLineSearch(5.0,
-                                              100,
-                                              convergenceMinimumValue=1e-4,
-                                              convergenceWindowSize=5)
-
+    R.SetOptimizerAsLBFGSB(gradientConvergenceTolerance=1e-5,
+                           # numberOfIterations=100,
+                           maximumNumberOfCorrections=5,
+                           maximumNumberOfFunctionEvaluations=1000,
+                           costFunctionConvergenceFactor=1e+4)
+    # R.SetOptimizerAsGradientDescentLineSearch(5.0,
+    #                                           100,
+    #                                           convergenceMinimumValue=1e-4,
+    #                                           convergenceWindowSize=5)
     R.SetInterpolator(sitk.sitkLinear)
-
     R.SetInitialTransformAsBSpline(sitk.BSplineTransformInitializer(movImg,
                                           transformDomainMeshSize),
                                    inPlace=True,
@@ -210,16 +242,12 @@ def BSplineMultiScale(fixImg, movImg, numberOfIterations):
 
     print('Optimizer\'s stopping condition, {0}'.format(R.GetOptimizerStopConditionDescription()))
     print('Final metric value: {0}'.format(R.GetMetricValue()))
-
     print(final_transform_v1)
     end = ti.time()
-
     return final_transform_v1, R.GetOptimizerStopConditionDescription(), end - start
 
 def BSplineSingleScale(fixImg, movImg, numberOfIterations):
     start = ti.time()
-
-    # Setting initial transformation
 
     transformDomainMeshSize = [2] * movImg.GetDimension()
     tx = sitk.BSplineTransformInitializer(fixImg,
@@ -236,64 +264,73 @@ def BSplineSingleScale(fixImg, movImg, numberOfIterations):
                            maximumNumberOfCorrections=5,
                            maximumNumberOfFunctionEvaluations=1000,
                            costFunctionConvergenceFactor=1e+4)
+
     R.SetInitialTransform(tx, True)
     R.SetInterpolator(sitk.sitkLinear)
 
-    # R.AddCommand(sitk.sitkIterationEvent, lambda: command_iteration(R))
-
     outTx = R.Execute(fixImg, movImg)
-
-    # initial_transform = sitk.BSplineTransformInitializer(fixImg,
-    #                                   transformDomainMeshSize )
-    #
-    #
-    # print initial_transform
-    #
-    # # Setting of mutual informartion method parameters
-    # registration_method = sitk.ImageRegistrationMethod()
-    # registration_method.SetMetricAsDemons(intensityDifferenceThreshold=0.001)
-    # registration_method.SetMetricSamplingStrategy(registration_method.RANDOM)
-    # registration_method.SetMetricSamplingPercentage(0.01)
-    #
-    # # Interpolator set as linear
-    # registration_method.SetInterpolator(sitk.sitkLinear)
-    # registration_method.SetOptimizerAsGradientDescent(learningRate=2.0, numberOfIterations=numberOfIterations)
-    # registration_method.SetOptimizerScalesFromPhysicalShift()
-    # registration_method.SetInitialTransform(initial_transform, inPlace=False)
-    #
-    # final_transform_v1 = registration_method.Execute(sitk.Cast(fixImg, sitk.sitkFloat32),
-    #                                                  sitk.Cast(movImg, sitk.sitkFloat32))
-    #
-    # print('Optimizer\'s stopping condition, {0}'.format(registration_method.GetOptimizerStopConditionDescription()))
-    # print('Final metric value: {0}'.format(registration_method.GetMetricValue()))
-    #
-    # print(final_transform_v1)
     end = ti.time()
-
     return outTx, R.GetMetricValue(), end - start
 
+def AffineTrans(fixImg, movImg, numberOfIterations):
+    start = ti.time()
+    initialTx = sitk.CenteredTransformInitializer(fixImg, movImg, sitk.AffineTransform(fixImg.GetDimension()))
+
+    R = sitk.ImageRegistrationMethod()
+    R.SetShrinkFactorsPerLevel([3, 2, 1])
+    R.SetSmoothingSigmasPerLevel([2, 1, 1])
+    R.SetMetricAsJointHistogramMutualInformation(20)
+    R.MetricUseFixedImageGradientFilterOff()
+
+    R.SetOptimizerAsLBFGSB(gradientConvergenceTolerance=1e-5,
+                           # numberOfIterations=100,
+                           maximumNumberOfCorrections=5,
+                           maximumNumberOfFunctionEvaluations=1000,
+                           costFunctionConvergenceFactor=1e+4)
+    # R.SetOptimizerAsGradientDescent(learningRate=1.0,
+    #                                 numberOfIterations=numberOfIterations,
+    #                                 estimateLearningRate=R.EachIteration)
+    R.SetOptimizerScalesFromPhysicalShift()
+
+    R.SetInitialTransform(initialTx, inPlace=True)
+
+    R.SetInterpolator(sitk.sitkLinear)
+
+    # R.AddCommand(sitk.sitkIterationEvent, lambda: command_iteration(R))
+    # R.AddCommand(sitk.sitkMultiResolutionIterationEvent, lambda: command_multiresolution_iteration(R))
+
+    outTx = R.Execute(fixImg, movImg)
+    end = ti.time()
+    return outTx, R.GetMetricValue(), end - start
 
 movImg = readDICOMSerieToImage(mov,'MRI',abs_file_path,0 ,0)
 fixImg = readDICOMSerieToImage(fix,'CT',abs_file_path,0 ,0)
 
+initTrans, ini50, iniTime = mutualInformationRegistrationWithGradientDescentOptimizer(fixImg=fixImg, movImg=movImg, numberOfIterations=50)
+initResampler = sitk.ResampleImageFilter()
+initResampler.SetReferenceImage(fixImg);
+initResampler.SetInterpolator(sitk.sitkLinear)
+initResampler.SetDefaultPixelValue(100)
+initResampler.SetTransform(initTrans)
 
+movImgTransformed = initResampler.Execute(movImg)
 
 tempDict = {}
 
 print 'BSpline Single scale'
-BSplineTrans, si100, time = BSplineSingleScale(fixImg=fixImg, movImg=movImg,numberOfIterations=100)
+BSplineTrans, si100, time = BSplineSingleScale(fixImg=fixImg, movImg=movImgTransformed,numberOfIterations=100)
 tempDict['BSpline'] = si100
 print 'Metric '+str(si100)+' Time '+str(time)+ ' sec'
 writerCSV.writerow(['MI_BSpline_Single', str(si100), '100', str(time)])
 print 'BSpline Multi-scale'
-BSplineTrans, mu100, time = BSplineMultiScale(fixImg=fixImg, movImg=movImg,numberOfIterations=100)
+BSplineTrans, mu100, time = BSplineMultiScale(fixImg=fixImg, movImg=movImgTransformed,numberOfIterations=100)
 tempDict['BSplineMulti'] = mu100
 print 'Metric '+str(mu100)+' Time '+str(time)+ ' sec'
 writerCSV.writerow(['MI_BSpline_Single', str(mu100), '100', str(time)])
 
 
 resampler = sitk.ResampleImageFilter()
-resampler.SetReferenceImage(fixImg);
+resampler.SetReferenceImage(fixImg)
 resampler.SetInterpolator(sitk.sitkLinear)
 resampler.SetDefaultPixelValue(100)
 resampler.SetTransform(BSplineTrans)

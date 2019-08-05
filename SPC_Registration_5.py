@@ -2,10 +2,15 @@
 import os
 import datetime
 import SimpleITK as sitk
-import time
+import time as ti
+import csv
+
+
 
 """
 Results akka metric value and so on will be saved in dictionary result and at the end will be saved in CSV file
+
+In this File is Scale vs Multiscale
 """
 results = {}
 
@@ -34,13 +39,19 @@ rel_path = "Results_Comaparation_Methods/"
 st = datetime.datetime.now().strftime("%d_%m_%y_%H%M")
 
 # Just for test removed timestamp folders tempora
-outputDirPath = rel_path+st
+# outputDirPath = rel_path+st
 
-# outputDirPath = rel_path+'test'
+outputDirPath = rel_path+'test'
 if not os.path.exists(outputDirPath):
     os.makedirs(outputDirPath)
 abs_file_path = os.path.join(script_dir, outputDirPath+'/')
 
+
+
+csvData = ['Method', 'Metric value', 'Number of iteration', 'Time']
+csvFile = open(abs_file_path+'results5.csv', 'w')
+writerCSV = csv.writer(csvFile)
+writerCSV.writerow(csvData)
 
 def observer(method) :
     """
@@ -135,7 +146,8 @@ def readDICOMSerieToImage(folder, *argv):
                 sitk.Show(sitk.ReadImage('C:/Users/duso/PycharmProjects/Semestralni_Prace/Old_tests/Results3/26_07_19_1111/MRI.nrrd'), 'test')
         return image
 
-def mutualInformationRegistrationWithGradientDescentOptimizer(fixImg, movImg):
+def MiSingleScale(fixImg, movImg, numberOfIterations):
+    start = ti.time()
 
     # Setting initial transformation
     initial_transform = sitk.CenteredTransformInitializer(sitk.Cast(fixImg, movImg.GetPixelID()),
@@ -152,7 +164,7 @@ def mutualInformationRegistrationWithGradientDescentOptimizer(fixImg, movImg):
 
     # Interpolator set as linear
     registration_method.SetInterpolator(sitk.sitkLinear)
-    registration_method.SetOptimizerAsGradientDescentLineSearch(learningRate=2.0, numberOfIterations=500)
+    registration_method.SetOptimizerAsGradientDescent(learningRate=2.0, numberOfIterations=numberOfIterations)
     registration_method.SetOptimizerScalesFromPhysicalShift()
     registration_method.SetInitialTransform(initial_transform, inPlace=False)
 
@@ -163,8 +175,82 @@ def mutualInformationRegistrationWithGradientDescentOptimizer(fixImg, movImg):
     print('Final metric value: {0}'.format(registration_method.GetMetricValue()))
 
     print(final_transform_v1)
+    end = ti.time()
 
-    return final_transform_v1,registration_method.GetOptimizerStopConditionDescription()
+    return final_transform_v1, registration_method.GetMetricValue(), end - start
+
+def MIMultiscale(fixImg, movImg, numberOfIterations):
+    start = ti.time()
+
+    # Setting initial transformation
+    initial_transform = sitk.CenteredTransformInitializer(sitk.Cast(fixImg, movImg.GetPixelID()),
+                                                          movImg,
+                                                          sitk.Euler3DTransform(),
+                                                          sitk.CenteredTransformInitializerFilter.GEOMETRY)
+    print initial_transform
+
+    registration_method = sitk.ImageRegistrationMethod()
+
+    registration_method.SetMetricAsMattesMutualInformation(numberOfHistogramBins=50)
+    registration_method.SetMetricSamplingStrategy(registration_method.RANDOM)
+    registration_method.SetMetricSamplingPercentage(0.01)
+
+    registration_method.SetInterpolator(sitk.sitkLinear)
+
+    registration_method.SetOptimizerAsGradientDescent(learningRate=2.0,
+                                                      numberOfIterations=numberOfIterations)  # , estimateLearningRate=registration_method.EachIteration)
+    registration_method.SetOptimizerScalesFromPhysicalShift()
+
+    final_transform = sitk.Euler3DTransform(initial_transform)
+    registration_method.SetInitialTransform(final_transform)
+    registration_method.SetShrinkFactorsPerLevel(shrinkFactors=[4, 2, 1])
+    registration_method.SetSmoothingSigmasPerLevel(smoothingSigmas=[2, 1, 0])
+    registration_method.SmoothingSigmasAreSpecifiedInPhysicalUnitsOn()
+
+
+    final_transform_v1 = registration_method.Execute(sitk.Cast(fixImg, sitk.sitkFloat32),
+                                                     sitk.Cast(movImg, sitk.sitkFloat32))
+
+    print('Optimizer\'s stopping condition, {0}'.format(registration_method.GetOptimizerStopConditionDescription()))
+    print('Final metric value: {0}'.format(registration_method.GetMetricValue()))
+
+    print(final_transform_v1)
+    end = ti.time()
+
+    return final_transform_v1, registration_method.GetOptimizerStopConditionDescription(), end - start
+
+def MiSingleScale(fixImg, movImg, numberOfIterations):
+    start = ti.time()
+
+    # Setting initial transformation
+    initial_transform = sitk.CenteredTransformInitializer(sitk.Cast(fixImg, movImg.GetPixelID()),
+                                                          movImg,
+                                                          sitk.Euler3DTransform(),
+                                                          sitk.CenteredTransformInitializerFilter.GEOMETRY)
+    print initial_transform
+
+    # Setting of mutual informartion method parameters
+    registration_method = sitk.ImageRegistrationMethod()
+    registration_method.SetMetricAsMattesMutualInformation(numberOfHistogramBins=50)
+    registration_method.SetMetricSamplingStrategy(registration_method.RANDOM)
+    registration_method.SetMetricSamplingPercentage(0.01)
+
+    # Interpolator set as linear
+    registration_method.SetInterpolator(sitk.sitkLinear)
+    registration_method.SetOptimizerAsGradientDescent(learningRate=2.0, numberOfIterations=numberOfIterations)
+    registration_method.SetOptimizerScalesFromPhysicalShift()
+    registration_method.SetInitialTransform(initial_transform, inPlace=False)
+
+    final_transform_v1 = registration_method.Execute(sitk.Cast(fixImg, sitk.sitkFloat32),
+                                                     sitk.Cast(movImg, sitk.sitkFloat32))
+
+    print('Optimizer\'s stopping condition, {0}'.format(registration_method.GetOptimizerStopConditionDescription()))
+    print('Final metric value: {0}'.format(registration_method.GetMetricValue()))
+
+    print(final_transform_v1)
+    end = ti.time()
+
+    return final_transform_v1, registration_method.GetMetricValue(), end - start
 
 
 movImg = readDICOMSerieToImage(mov,'MRI',abs_file_path,0 ,0)
@@ -172,122 +258,47 @@ fixImg = readDICOMSerieToImage(fix,'CT',abs_file_path,0 ,0)
 
 
 
-
-# # Smoothing
-# fixImgSmooth = sitk.CurvatureFlow(image1=fixImg,
-#                                   timeStep=0.25,
-#                                   numberOfIterations=20)
-#
-# movImgSmooth = sitk.CurvatureFlow(image1=movImg,
-#                                   timeStep=0.25,
-#                                   numberOfIterations=20)
-# # Gaussian filter
-# gaussianFilter = sitk.SmoothingRecursiveGaussianImageFilter()
-# gaussianFilter.SetSigma()
-# fixImgSmooth = gaussianFilter.Execute(fixImgSmooth)
-# movImgSmooth = gaussianFilter.Execute(movImgSmooth)
-
-writerP = sitk.ImageFileWriter()
-
-# Gaussian filter 2
-start = time.time()
-gaussianFilter = sitk.RecursiveGaussianImageFilter()
-gaussianFilter.SetSigma(1)
-
-fixImgSmoothGauss = gaussianFilter.Execute(fixImg)
-movImgSmoothGauss = gaussianFilter.Execute(movImg)
-
-end = time.time()
-
-writerP.SetFileName(abs_file_path + '/' + 'Gauss_smooth_01.nrrd')
-writerP.Execute(fixImg)
-
-writerP.SetFileName(abs_file_path + '/' + 'Gauss_smooth_02.nrrd')
-writerP.Execute(movImg)
-print 'Gaussian filtering done'
-print 'Time'+str(end-start)+'sec'
-
-# Median Filter
-start = time.time()
-medianFilter = sitk.MedianImageFilter()
-medianFilter.SetRadius(3)
-fixImgSmoothGauss = medianFilter.Execute(fixImg)
-movImgSmoothGauss = medianFilter.Execute(movImg)
-end = time.time()
-
-writerP.SetFileName(outputDirPath + '/' + 'Median11_smooth_01.nrrd')
-writerP.Execute(fixImgSmoothGauss)
-
-writerP.SetFileName(outputDirPath + '/' + 'Median11_smooth_02.nrrd')
-writerP.Execute(movImgSmoothGauss)
-print 'Median filtering done'
-print 'Time'+str(end-start)+'sec'
-
-
-start = time.time()
-medianFilter.SetRadius(5)
-fixImgSmoothGauss5 = medianFilter.Execute(fixImg)
-movImgSmoothGauss5 = medianFilter.Execute(movImg)
-end = time.time()
-writerP.SetFileName(outputDirPath + '/' + 'Median5_smooth_01.nrrd')
-writerP.Execute(fixImgSmoothGauss5)
-
-writerP.SetFileName(outputDirPath + '/' + 'Median5_smooth_02.nrrd')
-writerP.Execute(movImgSmoothGauss5)
-print 'Median with 5 neighborhoods filtering done'
-print 'Time'+str(end-start)+'sec'
-
-
-start = time.time()
-bilateralFilter = sitk.BilateralImageFilter()
-fixImgBilFil = bilateralFilter.Execute(fixImg)
-movImgBilFil = bilateralFilter.Execute(movImg)
-end = time.time()
-writerP.SetFileName(outputDirPath + '/' + 'Bill_smooth_01.nrrd')
-writerP.Execute(fixImgSmoothGauss5)
-
-writerP.SetFileName(outputDirPath + '/' + 'Bill_smooth_02.nrrd')
-writerP.Execute(movImgSmoothGauss5)
-print 'Bilateral filtering done'
-print 'Time'+str(end-start)+'sec'
-
-
-"""-----------------------------------------------------------------------------------------"""
-
-
-# writer = sitk.ImageFileWriter()
-#
-# writer.SetFileName(outputDirPath + '/' + '01.nrrd')
-# writer.Execute(fixImg)
-# writer.SetFileName(outputDirPath + '/' + '02.nrrd')
-# writer.Execute(fixImgSmooth)
-#
-# resample = sitk.ResampleImageFilter()
-# resample.SetReferenceImage(fixImg)
-
 tempDict = {}
 
-print 'MI Original registration...'
-MITrans = mutualInformationRegistrationWithGradientDescentOptimizer(fixImg=fixImg, movImg=movImg)
-tempDict['original'] = MITrans.GetMetricValue()
+print 'MI Signle scale'
+MITrans, si100, time = MiSingleScale(fixImg=fixImg, movImg=movImg,numberOfIterations=100)
+tempDict['MI'] = si100
+print 'Metric '+str(si100)+' Time '+str(time)+ ' sec'
+writerCSV.writerow(['MI_Gradient_Descent', str(si100), '100', str(time)])
 
-# MITransSmooth = mutualInformationRegistrationWithGradientDescentOptimizer(fixImg=fixImgSmooth,movImg=movImgSmooth)
-# tempDict['smooth'] = MITrans.GetMetricValue()
-print 'MI Gaussian filter used registration...'
-MITransGauss = mutualInformationRegistrationWithGradientDescentOptimizer(fixImg=fixImgSmoothGauss, movImg=movImgSmoothGauss)
-tempDict['Gaussian filter'] = MITrans.GetMetricValue()
 
-print 'MI Median registration...'
-MITransMedian = mutualInformationRegistrationWithGradientDescentOptimizer(fixImg=fixImgSmoothGauss, movImg=movImgSmoothGauss)
-tempDict['Median filter'] = MITrans.GetMetricValue()
+print 'MI Multiscale '
+MITrans, mu100, time = MIMultiscale(fixImg=fixImg, movImg=movImg,numberOfIterations=100)
+tempDict['MI'] = mu100
+print 'Metric '+str(mu100)+' Time '+str(time)+ ' sec'
+writerCSV.writerow(['MI_Gradient_Descent', str(mu100), '500', str(time)])
 
-print 'MI Median 5 neighborhood registration...'
-MITransMedian5 = mutualInformationRegistrationWithGradientDescentOptimizer(fixImg=fixImgSmoothGauss5, movImg=movImgSmoothGauss5)
-tempDict['Median filter 5 pixels'] = MITrans.GetMetricValue()
+print 'MI Signle scale 500'
+MITrans, si500, time = MiSingleScale(fixImg=fixImg, movImg=movImg,numberOfIterations=500)
+tempDict['MI'] = si500
+print 'Metric '+str(si500)+' Time '+str(time)+ ' sec'
+writerCSV.writerow(['MI_Gradient_Descent', str(si500), '100', str(time)])
 
-print 'MI bilateral registration...'
-MITransBil = mutualInformationRegistrationWithGradientDescentOptimizer(fixImg=fixImgBilFil, movImg=movImgBilFil)
-tempDict['Bilateral filter'] = MITrans.GetMetricValue()
+
+print 'MI Multiscale 500'
+MITrans, mu500, time = MIMultiscale(fixImg=fixImg, movImg=movImg,numberOfIterations=500)
+tempDict['MI'] = mu500
+print 'Metric '+str(mu500)+' Time '+str(time)+ ' sec'
+writerCSV.writerow(['MI_Gradient_Descent', str(mu500), '500', str(time)])
+
+
+""""""""""""""
+# print 'MI Powell Optimizer 100'
+# MITransGauss = mutualInformationRegistrationWithPowellOptimizer(fixImg=fixImg, movImg=movImg,numberOfIterations=100)
+# tempDict['original'] = metricVal
+# print 'Metric '+str(metricVal)+' Time '+str(time)+ ' sec'
+# writerCSV.writerow(['MI_Powell', str(metricVal), '100', str(time)])
+#
+# print 'MI Powell Optimizer 500'
+# MITransGauss = mutualInformationRegistrationWithPowellOptimizer(fixImg=fixImg, movImg=movImg,numberOfIterations=500)
+# tempDict['original'] = metricVal
+# print 'Metric '+str(metricVal)+' Time '+str(time)+ ' sec'
+# writerCSV.writerow(['MI_Powell', str(metricVal), '500', str(time)])
 
 # # SimpleITK supports several interpolation options, we go with the simplest that gives reasonable results.
 # resample.SetInterpolator(sitk.sitkLinear)
@@ -310,6 +321,6 @@ tempDict['Bilateral filter'] = MITrans.GetMetricValue()
 #
 # writer.SetFileName(outputDirPath + '/' + outFileName)
 # writer.Execute(cimg)
-
+csvFile.close()
 
 print '===END==='

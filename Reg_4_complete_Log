@@ -1,0 +1,578 @@
+C:\Users\duso\AppData\Local\Continuum\anaconda2\python.exe C:/Users/duso/PycharmProjects/Semestralni_Prace/SPC_Registration_4.py
+('Reading DICOMs from directory:', 'C:/ZCU/DATA_FOR_TEST/TCGA-LIHC/TCGA-BC-A10X/11-22-1992-MRI ABD WWO CONT-49239/10-LIVER-GAD-ENHANCEMENTT1F-78300')
+('Image size:', 256, 256, 22)
+('Writing image:', 'C:/Users/duso/PycharmProjects/Semestralni_Prace\\Results_Comaparation_Methods/test/MRI.nrrd')
+('Reading DICOMs from directory:', 'C:/ZCU/DATA_FOR_TEST/TCGA-LIHC/TCGA-BC-A10X/03-29-1993-CT ABDOMEN  WCONTRAST-43286/4-150cc OMNIPAQUE-36663')
+('Image size:', 512, 512, 36)
+('Writing image:', 'C:/Users/duso/PycharmProjects/Semestralni_Prace\\Results_Comaparation_Methods/test/CT.nrrd')
+MI Gradient Descent...100
+itk::simple::Transform
+ Euler3DTransform (0000000003E940E0)
+   RTTI typeinfo:   class itk::Euler3DTransform<double>
+   Reference Count: 1
+   Modified Time: 11369
+   Debug: Off
+   Object Name:
+   Observers:
+     none
+   Matrix:
+     1 0 0
+     0 1 0
+     0 0 1
+   Offset: [-8.68033, 28.9302, 413.476]
+   Center: [-6.33789, -35.3379, -410]
+   Translation: [-8.68033, 28.9302, 413.476]
+   Inverse:
+     1 0 0
+     0 1 0
+     0 0 1
+   Singular: 0
+   Euler's angles: AngleX=0 AngleY=0 AngleZ=0
+   m_ComputeZYX = 0
+
+Optimizer's stopping condition, GradientDescentOptimizerv4Template: Maximum number of iterations (100) exceeded.
+Final metric value: -0.416247535586
+itk::simple::Transform
+ CompositeTransform (0000000003B412E0)
+   RTTI typeinfo:   class itk::CompositeTransform<double,3>
+   Reference Count: 1
+   Modified Time: 423624
+   Debug: Off
+   Object Name:
+   Observers:
+     none
+   Transforms in queue, from begin to end:
+   >>>>>>>>>
+   Euler3DTransform (00000000030A1D00)
+     RTTI typeinfo:   class itk::Euler3DTransform<double>
+     Reference Count: 1
+     Modified Time: 423615
+     Debug: Off
+     Object Name:
+     Observers:
+       none
+     Matrix:
+       0.999861 0.0158095 -0.00531997
+       -0.0157479 0.999811 0.0114338
+       0.00549972 -0.0113484 0.99992
+     Offset: [-13.2486, 19.0534, 416.155]
+     Center: [-6.33789, -35.3379, -410]
+     Translation: [-11.6252, 14.472, 416.554]
+     Inverse:
+       0.999861 -0.0157479 0.00549972
+       0.0158095 0.999811 -0.0113484
+       -0.00531997 0.0114338 0.99992
+     Singular: 0
+     Euler's angles: AngleX=-0.0113487 AngleY=-0.0055001 AngleZ=-0.0158112
+     m_ComputeZYX = 0
+   End of MultiTransform.
+<<<<<<<<<<
+   TransformsToOptimizeFlags, begin() to end():
+      1
+   TransformsToOptimize in queue, from begin to end:
+   End of TransformsToOptimizeQueue.
+<<<<<<<<<<
+   End of CompositeTransform.
+<<<<<<<<<<
+
+Metric -0.416247535586 Time 4.55799984932 sec
+MI Gradient Descent...500
+itk::simple::Transform
+ Euler3DTransform (0000000003E940E0)
+   RTTI typeinfo:   class itk::Euler3DTransform<double>
+   Reference Count: 1
+   Modified Time: 423678
+   Debug: Off
+   Object Name:
+   Observers:
+     none
+   Matrix:
+     1 0 0
+     0 1 0
+     0 0 1
+   Offset: [-8.68033, 28.9302, 413.476]
+   Center: [-6.33789, -35.3379, -410]
+   Translation: [-8.68033, 28.9302, 413.476]
+   Inverse:
+     1 0 0
+     0 1 0
+     0 0 1
+   Singular: 0
+   Euler's angles: AngleX=0 AngleY=0 AngleZ=0
+   m_ComputeZYX = 0
+
+Optimizer's stopping condition, GradientDescentOptimizerv4Template: Convergence checker passed at iteration 41.
+Final metric value: -0.410325110411
+itk::simple::Transform
+ CompositeTransform (0000000004503430)
+   RTTI typeinfo:   class itk::CompositeTransform<double,3>
+   Reference Count: 1
+   Modified Time: 814200
+   Debug: Off
+   Object Name:
+   Observers:
+     none
+   Transforms in queue, from begin to end:
+   >>>>>>>>>
+   Euler3DTransform (0000000002A94DA0)
+     RTTI typeinfo:   class itk::Euler3DTransform<double>
+     Reference Count: 1
+     Modified Time: 813819
+     Debug: Off
+     Object Name:
+     Observers:
+       none
+     Matrix:
+       0.999971 0.00719253 -0.0024031
+       -0.00719256 0.999974 -5.17232e-006
+       0.002403 2.24566e-005 0.999997
+     Offset: [-11.5247, 15.5065, 414.801]
+     Center: [-6.33789, -35.3379, -410]
+     Translation: [-10.7934, 15.5551, 414.786]
+     Inverse:
+       0.999971 -0.00719256 0.002403
+       0.00719253 0.999974 2.24566e-005
+       -0.0024031 -5.17232e-006 0.999997
+     Singular: 0
+     Euler's angles: AngleX=2.24566e-005 AngleY=-0.002403 AngleZ=-0.00719259
+     m_ComputeZYX = 0
+   End of MultiTransform.
+<<<<<<<<<<
+   TransformsToOptimizeFlags, begin() to end():
+      1
+   TransformsToOptimize in queue, from begin to end:
+   End of TransformsToOptimizeQueue.
+<<<<<<<<<<
+   End of CompositeTransform.
+<<<<<<<<<<
+
+Metric -0.416247535586 Time 2.8069999218 sec
+MI Conjugate GradientLine Search Optimizer 100
+itk::simple::Transform
+ Euler3DTransform (0000000003E940E0)
+   RTTI typeinfo:   class itk::Euler3DTransform<double>
+   Reference Count: 1
+   Modified Time: 814254
+   Debug: Off
+   Object Name:
+   Observers:
+     none
+   Matrix:
+     1 0 0
+     0 1 0
+     0 0 1
+   Offset: [-8.68033, 28.9302, 413.476]
+   Center: [-6.33789, -35.3379, -410]
+   Translation: [-8.68033, 28.9302, 413.476]
+   Inverse:
+     1 0 0
+     0 1 0
+     0 0 1
+   Singular: 0
+   Euler's angles: AngleX=0 AngleY=0 AngleZ=0
+   m_ComputeZYX = 0
+
+Optimizer's stopping condition, GradientDescentOptimizerv4Template: Maximum number of iterations (100) exceeded.
+Final metric value: -0.419031795901
+itk::simple::Transform
+ CompositeTransform (0000000003B36440)
+   RTTI typeinfo:   class itk::CompositeTransform<double,3>
+   Reference Count: 1
+   Modified Time: 1226578
+   Debug: Off
+   Object Name:
+   Observers:
+     none
+   Transforms in queue, from begin to end:
+   >>>>>>>>>
+   Euler3DTransform (00000000030A1D00)
+     RTTI typeinfo:   class itk::Euler3DTransform<double>
+     Reference Count: 1
+     Modified Time: 1226569
+     Debug: Off
+     Object Name:
+     Observers:
+       none
+     Matrix:
+       0.999858 0.016258 -0.00437737
+       -0.0162173 0.999826 0.0091788
+       0.00452584 -0.00910651 0.999948
+     Offset: [-13.0735, 17.8774, 416.535]
+     Center: [-6.33789, -35.3379, -410]
+     Translation: [-11.8524, 14.223, 416.85]
+     Inverse:
+       0.999858 -0.0162173 0.00452584
+       0.016258 0.999826 -0.00910651
+       -0.00437737 0.0091788 0.999948
+     Singular: 0
+     Euler's angles: AngleX=-0.00910663 AngleY=-0.00452604 AngleZ=-0.0162594
+     m_ComputeZYX = 0
+   End of MultiTransform.
+<<<<<<<<<<
+   TransformsToOptimizeFlags, begin() to end():
+      1
+   TransformsToOptimize in queue, from begin to end:
+   End of TransformsToOptimizeQueue.
+<<<<<<<<<<
+   End of CompositeTransform.
+<<<<<<<<<<
+
+Metric -0.416247535586 Time 5.40400004387 sec
+MI Conjugate GradientLine Search Optimizer 500
+itk::simple::Transform
+ Euler3DTransform (0000000003E940E0)
+   RTTI typeinfo:   class itk::Euler3DTransform<double>
+   Reference Count: 1
+   Modified Time: 1226632
+   Debug: Off
+   Object Name:
+   Observers:
+     none
+   Matrix:
+     1 0 0
+     0 1 0
+     0 0 1
+   Offset: [-8.68033, 28.9302, 413.476]
+   Center: [-6.33789, -35.3379, -410]
+   Translation: [-8.68033, 28.9302, 413.476]
+   Inverse:
+     1 0 0
+     0 1 0
+     0 0 1
+   Singular: 0
+   Euler's angles: AngleX=0 AngleY=0 AngleZ=0
+   m_ComputeZYX = 0
+
+Optimizer's stopping condition, GradientDescentOptimizerv4Template: Maximum number of iterations (100) exceeded.
+Final metric value: -0.419445574664
+itk::simple::Transform
+ CompositeTransform (0000000003C7A720)
+   RTTI typeinfo:   class itk::CompositeTransform<double,3>
+   Reference Count: 1
+   Modified Time: 1639038
+   Debug: Off
+   Object Name:
+   Observers:
+     none
+   Transforms in queue, from begin to end:
+   >>>>>>>>>
+   Euler3DTransform (0000000003E392C0)
+     RTTI typeinfo:   class itk::Euler3DTransform<double>
+     Reference Count: 1
+     Modified Time: 1639029
+     Debug: Off
+     Object Name:
+     Observers:
+       none
+     Matrix:
+       0.999869 0.0153263 -0.00520352
+       -0.015283 0.999849 0.00825887
+       0.00532931 -0.00817826 0.999952
+     Offset: [-13.4178, 17.9359, 416.54]
+     Center: [-6.33789, -35.3379, -410]
+     Translation: [-11.8251, 14.6519, 416.815]
+     Inverse:
+       0.999869 -0.015283 0.00532931
+       0.0153263 0.999849 -0.00817826
+       -0.00520352 0.00825887 0.999952
+     Singular: 0
+     Euler's angles: AngleX=-0.00817835 AngleY=-0.00532951 AngleZ=-0.0153274
+     m_ComputeZYX = 0
+   End of MultiTransform.
+<<<<<<<<<<
+   TransformsToOptimizeFlags, begin() to end():
+      1
+   TransformsToOptimize in queue, from begin to end:
+   End of TransformsToOptimizeQueue.
+<<<<<<<<<<
+   End of CompositeTransform.
+<<<<<<<<<<
+
+Metric -0.416247535586 Time 5.26800012589 sec
+MI Amobea Optimizer 100
+itk::simple::Transform
+ Euler3DTransform (0000000003E940E0)
+   RTTI typeinfo:   class itk::Euler3DTransform<double>
+   Reference Count: 1
+   Modified Time: 1639092
+   Debug: Off
+   Object Name:
+   Observers:
+     none
+   Matrix:
+     1 0 0
+     0 1 0
+     0 0 1
+   Offset: [-8.68033, 28.9302, 413.476]
+   Center: [-6.33789, -35.3379, -410]
+   Translation: [-8.68033, 28.9302, 413.476]
+   Inverse:
+     1 0 0
+     0 1 0
+     0 0 1
+   Singular: 0
+   Euler's angles: AngleX=0 AngleY=0 AngleZ=0
+   m_ComputeZYX = 0
+
+Optimizer's stopping condition, AmoebaOptimizerv4: Maximum number of iterations exceeded. Number of iterations is 100
+Final metric value: -0.420074558037
+itk::simple::Transform
+ CompositeTransform (0000000003B412E0)
+   RTTI typeinfo:   class itk::CompositeTransform<double,3>
+   Reference Count: 1
+   Modified Time: 2017211
+   Debug: Off
+   Object Name:
+   Observers:
+     none
+   Transforms in queue, from begin to end:
+   >>>>>>>>>
+   Euler3DTransform (00000000030A1D00)
+     RTTI typeinfo:   class itk::Euler3DTransform<double>
+     Reference Count: 1
+     Modified Time: 2017203
+     Debug: Off
+     Object Name:
+     Observers:
+       none
+     Matrix:
+       1 -8.587e-005 4.14994e-005
+       8.58721e-005 1 -5.17583e-005
+       -4.1495e-005 5.17619e-005 1
+     Offset: [-13.6508, 15.7013, 426.487]
+     Center: [-6.33789, -35.3379, -410]
+     Translation: [-13.6648, 15.722, 426.486]
+     Inverse:
+       1 8.58721e-005 -4.1495e-005
+       -8.587e-005 1 5.17619e-005
+       4.14994e-005 -5.17583e-005 1
+     Singular: 0
+     Euler's angles: AngleX=5.17619e-005 AngleY=4.1495e-005 AngleZ=8.587e-005
+     m_ComputeZYX = 0
+   End of MultiTransform.
+<<<<<<<<<<
+   TransformsToOptimizeFlags, begin() to end():
+      1
+   TransformsToOptimize in queue, from begin to end:
+   End of TransformsToOptimizeQueue.
+<<<<<<<<<<
+   End of CompositeTransform.
+<<<<<<<<<<
+
+Metric -0.416247535586 Time 2.61199998856 sec
+MI Amobea Optimizer 500
+itk::simple::Transform
+ Euler3DTransform (0000000003C27130)
+   RTTI typeinfo:   class itk::Euler3DTransform<double>
+   Reference Count: 1
+   Modified Time: 2017265
+   Debug: Off
+   Object Name:
+   Observers:
+     none
+   Matrix:
+     1 0 0
+     0 1 0
+     0 0 1
+   Offset: [-8.68033, 28.9302, 413.476]
+   Center: [-6.33789, -35.3379, -410]
+   Translation: [-8.68033, 28.9302, 413.476]
+   Inverse:
+     1 0 0
+     0 1 0
+     0 0 1
+   Singular: 0
+   Euler's angles: AngleX=0 AngleY=0 AngleZ=0
+   m_ComputeZYX = 0
+
+Optimizer's stopping condition, AmoebaOptimizerv4: Both parameters convergence tolerance (1e-008) and function convergence tolerance (0.0001) have been met in 412 iterations.
+Final metric value: -0.415866145935
+itk::simple::Transform
+ CompositeTransform (0000000003C7A720)
+   RTTI typeinfo:   class itk::CompositeTransform<double,3>
+   Reference Count: 1
+   Modified Time: 2395977
+   Debug: Off
+   Object Name:
+   Observers:
+     none
+   Transforms in queue, from begin to end:
+   >>>>>>>>>
+   Euler3DTransform (0000000003DA5D20)
+     RTTI typeinfo:   class itk::Euler3DTransform<double>
+     Reference Count: 1
+     Modified Time: 2395969
+     Debug: Off
+     Object Name:
+     Observers:
+       none
+     Matrix:
+       1 -4.47031e-005 7.48595e-005
+       4.47004e-005 1 3.66757e-005
+       -7.48612e-005 -3.66724e-005 1
+     Offset: [-13.3278, 16.3335, 422.55]
+     Center: [-6.33789, -35.3379, -410]
+     Translation: [-13.3569, 16.3182, 422.552]
+     Inverse:
+       1 4.47004e-005 -7.48612e-005
+       -4.47031e-005 1 -3.66724e-005
+       7.48595e-005 3.66757e-005 1
+     Singular: 0
+     Euler's angles: AngleX=-3.66724e-005 AngleY=7.48612e-005 AngleZ=4.47031e-005
+     m_ComputeZYX = 0
+   End of MultiTransform.
+<<<<<<<<<<
+   TransformsToOptimizeFlags, begin() to end():
+      1
+   TransformsToOptimize in queue, from begin to end:
+   End of TransformsToOptimizeQueue.
+<<<<<<<<<<
+   End of CompositeTransform.
+<<<<<<<<<<
+
+Metric -0.416247535586 Time 8.05500006676 sec
+MI LBFGSB Optimizer 100
+itk::simple::Transform
+ Euler3DTransform (000000000569B200)
+   RTTI typeinfo:   class itk::Euler3DTransform<double>
+   Reference Count: 1
+   Modified Time: 2396031
+   Debug: Off
+   Object Name:
+   Observers:
+     none
+   Matrix:
+     1 0 0
+     0 1 0
+     0 0 1
+   Offset: [-8.68033, 28.9302, 413.476]
+   Center: [-6.33789, -35.3379, -410]
+   Translation: [-8.68033, 28.9302, 413.476]
+   Inverse:
+     1 0 0
+     0 1 0
+     0 0 1
+   Singular: 0
+   Euler's angles: AngleX=0 AngleY=0 AngleZ=0
+   m_ComputeZYX = 0
+
+Optimizer's stopping condition, LBFGSBOptimizerv4: Function tolerance reached after 3 iterations. The relative reduction of the cost function <= 2.22045e-009 = CostFunctionConvergenceFactor (1e+007) * machine precision (2.22045e-016).
+Final metric value: -0.346802493257
+itk::simple::Transform
+ CompositeTransform (0000000003B36440)
+   RTTI typeinfo:   class itk::CompositeTransform<double,3>
+   Reference Count: 1
+   Modified Time: 2774128
+   Debug: Off
+   Object Name:
+   Observers:
+     none
+   Transforms in queue, from begin to end:
+   >>>>>>>>>
+   Euler3DTransform (000000000569A000)
+     RTTI typeinfo:   class itk::Euler3DTransform<double>
+     Reference Count: 1
+     Modified Time: 2774120
+     Debug: Off
+     Object Name:
+     Observers:
+       none
+     Matrix:
+       0.99698 0.0750898 -0.0198332
+       -0.0759261 0.996077 -0.0454595
+       0.0163419 0.046828 0.998769
+     Offset: [-14.1781, 9.66813, 414.73]
+     Center: [-6.33789, -35.3379, -410]
+     Translation: [-8.6808, 28.9264, 413.476]
+     Inverse:
+       0.99698 -0.0759261 0.0163419
+       0.0750898 0.996077 0.046828
+       -0.0198332 -0.0454595 0.998769
+     Singular: 0
+     Euler's angles: AngleX=0.0468452 AngleY=-0.0163605 AngleZ=-0.0752433
+     m_ComputeZYX = 0
+   End of MultiTransform.
+<<<<<<<<<<
+   TransformsToOptimizeFlags, begin() to end():
+      1
+   TransformsToOptimize in queue, from begin to end:
+   End of TransformsToOptimizeQueue.
+<<<<<<<<<<
+   End of CompositeTransform.
+<<<<<<<<<<
+
+Metric -0.416247535586 Time 2.07199978828 sec
+MI LBFGSB Optimizer 500
+itk::simple::Transform
+ Euler3DTransform (000000000569B800)
+   RTTI typeinfo:   class itk::Euler3DTransform<double>
+   Reference Count: 1
+   Modified Time: 2774182
+   Debug: Off
+   Object Name:
+   Observers:
+     none
+   Matrix:
+     1 0 0
+     0 1 0
+     0 0 1
+   Offset: [-8.68033, 28.9302, 413.476]
+   Center: [-6.33789, -35.3379, -410]
+   Translation: [-8.68033, 28.9302, 413.476]
+   Inverse:
+     1 0 0
+     0 1 0
+     0 0 1
+   Singular: 0
+   Euler's angles: AngleX=0 AngleY=0 AngleZ=0
+   m_ComputeZYX = 0
+
+Optimizer's stopping condition, LBFGSBOptimizerv4: Function tolerance reached after 6 iterations. The relative reduction of the cost function <= 2.22045e-009 = CostFunctionConvergenceFactor (1e+007) * machine precision (2.22045e-016).
+Final metric value: -0.342944807522
+itk::simple::Transform
+ CompositeTransform (0000000003C7A720)
+   RTTI typeinfo:   class itk::CompositeTransform<double,3>
+   Reference Count: 1
+   Modified Time: 3152300
+   Debug: Off
+   Object Name:
+   Observers:
+     none
+   Transforms in queue, from begin to end:
+   >>>>>>>>>
+   Euler3DTransform (000000000569AA00)
+     RTTI typeinfo:   class itk::Euler3DTransform<double>
+     Reference Count: 1
+     Modified Time: 3152292
+     Debug: Off
+     Object Name:
+     Observers:
+       none
+     Matrix:
+       0.995688 0.0850995 -0.0369197
+       -0.087474 0.993819 -0.0683461
+       0.0308753 0.0712809 0.996978
+     Offset: [-20.839, 0.123631, 414.952]
+     Center: [-6.33789, -35.3379, -410]
+     Translation: [-8.68188, 28.9183, 413.477]
+     Inverse:
+       0.995688 -0.087474 0.0308753
+       0.0850995 0.993819 0.0712809
+       -0.0369197 -0.0683461 0.996978
+     Singular: 0
+     Euler's angles: AngleX=0.0713414 AngleY=-0.030959 AngleZ=-0.0854203
+     m_ComputeZYX = 0
+   End of MultiTransform.
+<<<<<<<<<<
+   TransformsToOptimizeFlags, begin() to end():
+      1
+   TransformsToOptimize in queue, from begin to end:
+   End of TransformsToOptimizeQueue.
+<<<<<<<<<<
+   End of CompositeTransform.
+<<<<<<<<<<
+
+Metric -0.416247535586 Time 3.73600006104 sec
+===END===
+
+Process finished with exit code 0

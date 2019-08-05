@@ -75,13 +75,13 @@ def mutualInformationRegistrationWithGradientDescentOptimizer(fixImg, movImg, nu
 
     # Setting of mutual informartion method parameters
     registration_method = sitk.ImageRegistrationMethod()
-    registration_method.SetMetricAsMattesMutualInformation(numberOfHistogramBins=50)
+    registration_method.SetMetricAsMattesMutualInformation(numberOfHistogramBins=100)
     registration_method.SetMetricSamplingStrategy(registration_method.RANDOM)
     registration_method.SetMetricSamplingPercentage(0.01)
 
     # Interpolator set as linear
     registration_method.SetInterpolator(sitk.sitkLinear)
-    registration_method.SetOptimizerAsGradientDescent(learningRate=2.0, numberOfIterations=numberOfIterations)
+    registration_method.SetOptimizerAsGradientDescent(learningRate=1.0, numberOfIterations=numberOfIterations)
     registration_method.SetOptimizerScalesFromPhysicalShift()
     registration_method.SetInitialTransform(initial_transform, inPlace=False)
 
@@ -260,7 +260,7 @@ def BSplineSingleScale(fixImg, movImg, numberOfIterations):
     R.SetMetricAsCorrelation()
 
     R.SetOptimizerAsLBFGSB(gradientConvergenceTolerance=1e-5,
-                           # numberOfIterations=100,
+                           numberOfIterations=100,
                            maximumNumberOfCorrections=5,
                            maximumNumberOfFunctionEvaluations=1000,
                            costFunctionConvergenceFactor=1e+4)
@@ -277,15 +277,15 @@ def AffineTrans(fixImg, movImg, numberOfIterations):
     initialTx = sitk.CenteredTransformInitializer(fixImg, movImg, sitk.AffineTransform(fixImg.GetDimension()))
 
     R = sitk.ImageRegistrationMethod()
-    R.SetShrinkFactorsPerLevel([3, 2, 1])
+    R.SetShrinkFactorsPerLevel([4, 2, 1])
     R.SetSmoothingSigmasPerLevel([2, 1, 1])
-    R.SetMetricAsJointHistogramMutualInformation(20)
+    R.SetMetricAsJointHistogramMutualInformation(70)
     R.MetricUseFixedImageGradientFilterOff()
 
     R.SetOptimizerAsLBFGSB(gradientConvergenceTolerance=1e-5,
                            # numberOfIterations=100,
                            maximumNumberOfCorrections=5,
-                           maximumNumberOfFunctionEvaluations=1000,
+                           maximumNumberOfFunctionEvaluations=100,
                            costFunctionConvergenceFactor=1e+4)
     # R.SetOptimizerAsGradientDescent(learningRate=1.0,
     #                                 numberOfIterations=numberOfIterations,
@@ -306,7 +306,7 @@ def AffineTrans(fixImg, movImg, numberOfIterations):
 movImg = readDICOMSerieToImage(mov,'MRI',abs_file_path,0 ,0)
 fixImg = readDICOMSerieToImage(fix,'CT',abs_file_path,0 ,0)
 
-initTrans, ini50, iniTime = mutualInformationRegistrationWithGradientDescentOptimizer(fixImg=fixImg, movImg=movImg, numberOfIterations=50)
+initTrans, ini50, iniTime = mutualInformationRegistrationWithGradientDescentOptimizer(fixImg=fixImg, movImg=movImg, numberOfIterations=500)
 initResampler = sitk.ResampleImageFilter()
 initResampler.SetReferenceImage(fixImg);
 initResampler.SetInterpolator(sitk.sitkLinear)
@@ -315,36 +315,48 @@ initResampler.SetTransform(initTrans)
 
 movImgTransformed = initResampler.Execute(movImg)
 
-tempDict = {}
 
-print 'BSpline Single scale'
-BSplineTrans, si100, time = BSplineSingleScale(fixImg=fixImg, movImg=movImgTransformed,numberOfIterations=100)
-tempDict['BSpline'] = si100
+
+tempDict = {}
+print 'Affine Single scale'
+AffineTrans, si100, time = AffineTrans(fixImg=fixImg, movImg=movImgTransformed,numberOfIterations=100)
+tempDict['Affine'] = si100
 print 'Metric '+str(si100)+' Time '+str(time)+ ' sec'
-writerCSV.writerow(['MI_BSpline_Single', str(si100), '100', str(time)])
-print 'BSpline Multi-scale'
-BSplineTrans, mu100, time = BSplineMultiScale(fixImg=fixImg, movImg=movImgTransformed,numberOfIterations=100)
-tempDict['BSplineMulti'] = mu100
-print 'Metric '+str(mu100)+' Time '+str(time)+ ' sec'
-writerCSV.writerow(['MI_BSpline_Single', str(mu100), '100', str(time)])
+
+# print 'BSpline Single scale'
+# BSplineTrans, si100, time = BSplineSingleScale(fixImg=fixImg, movImg=movImgTransformed,numberOfIterations=100)
+# tempDict['BSpline'] = si100
+# print 'Metric '+str(si100)+' Time '+str(time)+ ' sec'
+# writerCSV.writerow(['MI_BSpline_Single', str(si100), '100', str(time)])
+# print 'BSpline Multi-scale'
+# BSplineTrans, mu100, time = BSplineMultiScale(fixImg=fixImg, movImg=movImgTransformed,numberOfIterations=100)
+# tempDict['BSplineMulti'] = mu100
+# print 'Metric '+str(mu100)+' Time '+str(time)+ ' sec'
+# writerCSV.writerow(['MI_BSpline_Single', str(mu100), '100', str(time)])
 
 
 resampler = sitk.ResampleImageFilter()
 resampler.SetReferenceImage(fixImg)
 resampler.SetInterpolator(sitk.sitkLinear)
 resampler.SetDefaultPixelValue(100)
-resampler.SetTransform(BSplineTrans)
+resampler.SetTransform(AffineTrans)
 
 out = resampler.Execute(movImg)
 simg1 = sitk.Cast(sitk.RescaleIntensity(fixImg), sitk.sitkUInt8)
 simg2 = sitk.Cast(sitk.RescaleIntensity(out), sitk.sitkUInt8)
 cimg = sitk.Compose(simg1, simg2, simg1//2.+simg2//2.)
 # sitk.Show( cimg, "ImageRegistration1 Composition" )
-outFileName = 'BSpline.nrrd'
+outFileName = 'Affine.nrrd'
 writer2 = sitk.ImageFileWriter()
 writer2.SetFileName(outputDirPath + '/' + outFileName)
 
 writer2.Execute(cimg)
+
+outFileName = 'AfterInitialization.nrrd'
+
+writer2.SetFileName(outputDirPath + '/' + outFileName)
+
+writer2.Execute(movImgTransformed)
 
 
 csvFile.close()

@@ -329,7 +329,7 @@ out = resampler.Execute(movImg)
 simg1 = sitk.Cast(sitk.RescaleIntensity(fixImg), sitk.sitkUInt8)
 simg2 = sitk.Cast(sitk.RescaleIntensity(out), sitk.sitkUInt8)
 cimg = sitk.Compose(simg1, simg2, simg1 // 2. + simg2 // 2.)
-sitk.Show(cimg, "RESULT")
+# sitk.Show(cimg, "RESULT")
 
 outFileName = 'DIC_RESULT.nrrd'
 writer = itk.ImageFileWriter[ itk.Image[itk.ctype('signed short'), 3]].New()

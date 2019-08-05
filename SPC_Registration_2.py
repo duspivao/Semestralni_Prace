@@ -131,7 +131,7 @@ def readDICOMSerieToImage(folder, *argv):
         return image
 
 movImg = readDICOMSerieToImage(mov,'MRI',abs_file_path,0 ,0)
-fixImg = readDICOMSerieToImage(fix,'CT',abs_file_path,0 ,0)
+fixImg = readDICOMSerieToImage(fix,'CT',abs_file_path,0 ,1)
 
 # Smoothing
 fixImgSmooth = sitk.CurvatureFlow(image1=fixImg,
