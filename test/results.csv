@@ -1,0 +1,3 @@
+Method,Metric value,Number of iteration,Time
+MI_Gradient_Descent,-0.416247535586,100,3.60500001907
+MI_Gradient_Descent,-0.416247535586,500,3.23900008202
