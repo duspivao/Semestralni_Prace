@@ -9,7 +9,7 @@ import datetime
 
 # label = 'PATIENT_DICOM'
 label = 'TEMP'
-inputFile = 'C:/ZCU/3Dircadb1/3Dircadb1.1/'+label
+inputFile = 'C:/ZCU/DATA_FOR_TEST/TCGA-LIHC/TCGA-BC-A10X/11-22-1992-MRI ABD WWO CONT-49239/11-LIVER-GAD-ENHANCEMENTT1F-68307'
 
 newpath = 'C:/ZCU/Results/'
 st = datetime.datetime.now().strftime("%d_%m_%y_%H%M")
